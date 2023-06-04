@@ -4,6 +4,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import Notiflix from 'notiflix';
 
+// Вибір елементів
 const date = document.querySelector('#datetime-picker');
 const btn = document.querySelector('[data-start]');
 const day = document.querySelector('[data-days]');
@@ -14,6 +15,8 @@ const spans = document.querySelectorAll('.value');
 
 let timerId = null;
 btn.disabled = true;
+
+// Ініціалізація flatpickr
 flatpickr(date, {
   enableTime: true,
   time_24hr: true,
@@ -31,12 +34,16 @@ flatpickr(date, {
   },
 });
 
+// Додавання обробника подій до кнопки "Старт"
 btn.addEventListener('click', onBtnStartClick);
 
 function onBtnStartClick() {
+  // Зміна класу для елементів
   spans.forEach(item => item.classList.toggle('end'));
   btn.disabled = true;
   date.disabled = true;
+
+  // Запуск таймера
   timerId = setInterval(() => {
     const choosenDate = new Date(date.value);
     const timeToFinish = choosenDate - Date.now();
@@ -48,6 +55,7 @@ function onBtnStartClick() {
     sec.textContent = addLeadingZero(seconds);
 
     if (timeToFinish < 1000) {
+      // Зміна класу для елементів
       spans.forEach(item => item.classList.toggle('end'));
       clearInterval(timerId);
       date.disabled = false;
