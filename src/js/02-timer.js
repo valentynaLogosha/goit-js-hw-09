@@ -1,4 +1,3 @@
-
 // /Імпорт бібліотек flatpickr та Notiflix і підключення CSS-стилів для flatpickr
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -22,13 +21,12 @@ flatpickr(date, {
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
-  onClose(selectedDates) {
-    if (selectedDates[0] <= Date.now()) {
+  onClose([selectedDate]) {
+    if (selectedDate <= Date.now()) {
       Notiflix.Notify.failure('Please choose a date in the future');
       btn.disabled = true;
     } else {
       btn.disabled = false;
-
       Notiflix.Notify.success('Lets go?');
     }
   },
@@ -38,29 +36,37 @@ flatpickr(date, {
 btn.addEventListener('click', onBtnStartClick);
 
 function onBtnStartClick() {
-  // Зміна класу для елементів
-  spans.forEach(item => item.classList.toggle('end'));
+  toggleElementsClass();
   btn.disabled = true;
   date.disabled = true;
 
   // Запуск таймера
-  timerId = setInterval(() => {
-    const choosenDate = new Date(date.value);
-    const timeToFinish = choosenDate - Date.now();
-    const { days, hours, minutes, seconds } = convertMs(timeToFinish);
+  timerId = setInterval(updateTimerDisplay, 1000);
+}
 
-    day.textContent = addLeadingZero(days);
-    hour.textContent = addLeadingZero(hours);
-    min.textContent = addLeadingZero(minutes);
-    sec.textContent = addLeadingZero(seconds);
+function toggleElementsClass() {
+  spans.forEach(item => item.classList.toggle('end'));
+}
 
-    if (timeToFinish < 1000) {
-      // Зміна класу для елементів
-      spans.forEach(item => item.classList.toggle('end'));
-      clearInterval(timerId);
-      date.disabled = false;
-    }
-  }, 1000);
+function updateTimerDisplay() {
+  const choosenDate = new Date(date.value);
+  const timeToFinish = choosenDate - Date.now();
+  const { days, hours, minutes, seconds } = convertMs(timeToFinish);
+
+  updateDisplay(day, days);
+  updateDisplay(hour, hours);
+  updateDisplay(min, minutes);
+  updateDisplay(sec, seconds);
+
+  if (timeToFinish < 1000) {
+    toggleElementsClass();
+    clearInterval(timerId);
+    date.disabled = false;
+  }
+}
+
+function updateDisplay(element, value) {
+  element.textContent = addLeadingZero(value);
 }
 
 function convertMs(ms) {
@@ -84,4 +90,4 @@ function convertMs(ms) {
 
 function addLeadingZero(value) {
   return `${value}`.padStart(2, '0');
-} 
+}
